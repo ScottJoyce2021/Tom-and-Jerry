@@ -11,7 +11,7 @@ namespace compressions
         {
             var list = new List<int>();
             char header = ' ';
-            string fileName = @"C:\Users\Scott Joyce\source\repos\panda-bear-ScottJoyce2021\bin\Tom_Jerry.pgm";
+            string fileName = @"C:\Users\scjoy\source\repos\Tom and Jerry\bin\Dice.pgm";
             {
                 byte[] line;
                 line = File.ReadAllBytes(fileName);
@@ -34,7 +34,7 @@ namespace compressions
             char check = ' ';
             char header = ' ';
             int rv = 0;
-            using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\Scott Joyce\source\repos\panda-bear-ScottJoyce2021\bin\pgm-compressed.pgm", FileMode.Create)))
+            using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-compressed.pgm", FileMode.Create)))
             {
                 for (int i = 0; i < arr.Length; i++)
                 {
@@ -68,7 +68,7 @@ namespace compressions
         {
             char header = ' ';
             int rv = 0;
-            using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\Scott Joyce\source\repos\panda-bear-ScottJoyce2021\bin\pgm-decompressed.pgm", FileMode.Create)))
+            using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-decompressed.pgm", FileMode.Create)))
             {
                 for (int i = 0; i < arr.Length; i++)
                 {
