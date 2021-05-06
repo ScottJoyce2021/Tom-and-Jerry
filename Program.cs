@@ -24,7 +24,8 @@ namespace compressions
                 }
                 createDictionary(line);
                 comppress(line);
-                deCompress(line);
+                byte[] newByte = File.ReadAllBytes(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-compressed.pgm");
+                deCompress(newByte);
             }
 
             Console.ReadKey();
@@ -71,52 +72,68 @@ namespace compressions
         static int comppress(byte[] arr)
         {
             int maxVal = 255;
-            int count = 1;
-            char check = ' ';
-            char header = ' ';
+            byte count = 1;
+            byte check;
+            byte header;
             int rv = 0;
             using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-compressed.pgm", FileMode.Create)))
             {
-                for (int i = 0; i < arr.Length; i++)
+                for (int i = 0; i < 16; i++)
                 {
-                    header = (char)arr[i];
-                    if (arr[i] > 127) { break; }
+                    header = arr[i];
                     writer.Write(header);
                 }
-                for (int i = 16; i < arr.Length; i++)
+                check = arr[16];
+                for (int i = 17; i < arr.Length; i++)
                 {
-                    if (check == ' ')
+                    if (check == arr[i])
                     {
-                        check = (char)arr[i];
-                        count++;
+                        count++; 
+                        if (count == maxVal)
+                        {
+                            writer.Write(check);
+                            writer.Write(count);
+                            count = 0;                          
+                        }
                     }
-                    else if (check == (char)arr[i] && count < maxVal)
-                    {
-                        count++;
-                    }
+                   
                     else
                     {
-                        writer.Write((byte)count);
-                        writer.Write((byte)check);
+                        writer.Write(check);
+                        writer.Write(count);
                         count = 1;
-                        check = (char)arr[i];
+                        check = arr[i];
                     }
                 }
+                writer.Write(check);
+                writer.Write(count);
             }
+
             return rv;
         }
         static int deCompress(byte[] arr)
         {
-            char header = ' ';
+            byte header;
+            byte count;
             int rv = 0;
             using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-decompressed.pgm", FileMode.Create)))
             {
-                for (int i = 0; i < arr.Length; i++)
+                for(int i = 0; i < 16; i++)
                 {
-                    header = (char)arr[i];
-                    if (arr[i] > 127) { break; }
+                    header = arr[i];        
                     writer.Write(header);
                 }
+                for (int i = 16; i < arr.Length; i+=2)
+                {
+                    header = arr[i];
+                    count = arr[i+1];
+                    for (int j = 0; j < count;j++)
+                    {
+                        writer.Write(header);
+                    }
+                    
+                }
+
             }
             return rv;
         }
