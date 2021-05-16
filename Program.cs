@@ -8,6 +8,7 @@ namespace compressions
     class Program
     {
         static Dictionary<byte, byte> myDictionary = new Dictionary<byte, byte>();
+        static byte seperater = 16;
         static void Main(string[] args)
         {
             var list = new List<int>();
@@ -73,7 +74,7 @@ namespace compressions
         {
             int maxVal = 255;
             byte count = 1;
-            byte check;
+            byte check = 1;
             byte header;
             int rv = 0;
             using (BinaryWriter writer = new BinaryWriter(File.Open(@"C:\Users\scjoy\source\repos\Tom and Jerry\bin\pgm-compressed.pgm", FileMode.Create)))
@@ -83,32 +84,39 @@ namespace compressions
                     header = arr[i];
                     writer.Write(header);
                 }
-                check = arr[16];
-                for (int i = 17; i < arr.Length; i++)
+                for (int i = 16; i < arr.Length; i++)
                 {
-                    if (check == arr[i])
+                    check = arr[i];
+                    if (myDictionary[check] < seperater)
                     {
-                        count++; 
-                        if (count == maxVal)
+                        i++;
+                        while ( i < arr.Length && check == arr[i])
                         {
-                            writer.Write(check);
-                            writer.Write(count);
-                            count = 0;                          
+                            count++;                    
+                            if (count == maxVal)
+                            {
+                                writer.Write(check);
+                                writer.Write(count);
+                                count = 0;
+                            }
+                            i++;
                         }
-                    }
-                   
-                    else
-                    {
                         writer.Write(check);
                         writer.Write(count);
                         count = 1;
-                        check = arr[i];
+                        if(i < arr.Length)
+                        {
+                            check = arr[i];
+                        }
+                    }
+                    else
+                    {
+                        writer.Write(check);
                     }
                 }
                 writer.Write(check);
                 writer.Write(count);
             }
-
             return rv;
         }
         static int deCompress(byte[] arr)
@@ -131,9 +139,7 @@ namespace compressions
                     {
                         writer.Write(header);
                     }
-                    
                 }
-
             }
             return rv;
         }
