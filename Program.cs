@@ -8,20 +8,26 @@ namespace compressions
     class Program
     {
         static Dictionary<byte, byte> myDictionary = new Dictionary<byte, byte>();
-        static byte seperater = 2;
+        static byte seperater = 4;
+        static byte mask = 0xf8;
         static void Main(string[] args)
         {
             string Tomjerry = @"C:\Users\scjoy\source\repos\ScottJoyce2021\Tom-and-Jerry\bin\Tom_Jerry.pgm";
             string Dice = @"C:\Users\scjoy\source\repos\ScottJoyce2021\Tom-and-Jerry\bin\Dice.pgm";
-            Console.WriteLine("Please select a file either Tom_Jerry  or Dice");
+            string Lion = @"C:\Users\scjoy\source\repos\ScottJoyce2021\Tom-and-Jerry\bin\lion-face.pgm";
+            Console.WriteLine("Please select a file, Tom_Jerry, Dice, or Lion");
             string Fileselect = Console.ReadLine();
             if(Fileselect == "Tom_Jerry")
             {
                 Fileselect = Tomjerry;
             }
-            else
+            else if(Fileselect == "Dice")
             {
                 Fileselect = Dice;
+            }
+            else
+            {
+                Fileselect = Lion;
             }
             var list = new List<int>();
             char header = ' ';
@@ -40,17 +46,16 @@ namespace compressions
                 byte[] newByte = File.ReadAllBytes(@"C:\Users\scjoy\source\repos\ScottJoyce2021\Tom-and-Jerry\bin\pgm-compressed.pgm");
                 deCompress(newByte);
             }
-
             Console.ReadKey();
         }
         static void createDictionary(byte[] arr) 
         {
             int streaks = 1;
-            byte grayscaleVal = arr[16];
+            byte grayscaleVal = (byte)(arr[16] & mask);
             int[] saveStreak = new int [256];
             for(int i = 17; i < arr.Length; i++)
             {
-                if(arr[i] == grayscaleVal)
+                if((byte)(arr[i] & mask) == grayscaleVal)
                 {
                     streaks++;
                     if(streaks == 3)
@@ -62,9 +67,8 @@ namespace compressions
                 else
                 {
                     streaks = 1;
-                    grayscaleVal = arr[i];
+                    grayscaleVal = (byte)(arr[i] & mask);
                 }
-                
             } 
             for(int j = 0; j < 256; j++)
             {
@@ -83,8 +87,7 @@ namespace compressions
             }
         }
         static int comppress(byte[] arr)
-        {
-            
+        {            
             int maxVal = 255;
             byte count = 1;
             byte check = 1;
@@ -103,11 +106,11 @@ namespace compressions
                 }
                 for (int i = 16; i < arr.Length;)
                 {
-                    check = arr[i];
+                    check = (byte)(arr[i] & mask);
                     if (myDictionary[check] < seperater)
                     {
                         i++;
-                        while ( i < arr.Length && check == arr[i])
+                        while ( i < arr.Length && check == (byte)(arr[i] & mask))
                         {
                             count++;                    
                             if (count == maxVal)
@@ -123,7 +126,7 @@ namespace compressions
                         count = 1;
                         if(i < arr.Length)
                         {
-                            check = arr[i];
+                            check = (byte)(arr[i] & mask);
                         }
                     }
                     else
@@ -155,7 +158,6 @@ namespace compressions
                 {
                     newDictionary.Add((byte)(i-16), arr[i]);
                 }
-
                 for (int i = 256 + 16; i < arr.Length;)
                 {
                     val = arr[i];
@@ -172,16 +174,10 @@ namespace compressions
                     {
                         writer.Write(val);
                         i++;
-                    }
-                    
+                    } 
                 }
-                
-                
-              
-                
             }
             return rv;
-
         }
     }
 }
